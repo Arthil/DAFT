@@ -65,6 +65,9 @@ DAFT is also split code wise with _testing_harness_ including the code BBB uses
 and _pc_host_ including the code the PC uses. The program that BBB uses is
 called AFT (Automatic Flasher Tester) and the program that the PC uses is DAFT.
 
+![](readme_pictures/BBB_booting.png)
+
+
 ## 1.2 How it works
 
 At the highest level DAFT is called from the command line with the device type
