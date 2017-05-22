@@ -100,6 +100,7 @@ with the device so own test can be written or existing test suites can be
 integrated.
 
 ![](readme_pictures/daft_run.png)
+
 _Running daft._
 
 1. Start daft by executing the following command in the PC Host: "daft DUT PATH/TO/IMG.img". You can also run the command directly in BBB but it then it won't lock the DUTs. Running daft in BBB is done with the command "aft DUT PATH/TO/IMG.img".In case you want to only flash or test or boot the DUT refer to [DAFT commandline interface](#32-daft-commandline-interface) to add correct options for DAFT.
