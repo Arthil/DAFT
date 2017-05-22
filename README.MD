@@ -35,6 +35,7 @@
     * 6.1 [Beaglebone Black booting](#61-beaglebone-black-booting)
     * 6.2 [DHCP problems](#62-dhcp-problems)
     * 6.3 [TFTP problems](#63-tftp-problems)
+    * 6.4 [NFS problems](#64-nfs-problems)
 
 [DAFT hardware images](#daft-hardware-images)
 
@@ -78,7 +79,7 @@ The above diagram shows the steps when setting up the BBB and booting it:
 2. Get an IP adress for the BBB from the DHCP server. Refer to [DHCP problems](#62-dhcp-problems) if you are having issues with this.
 3. Get the BBB bootsystem kernel via TFTP. The BBB will fetch the bootsystem kernel from the PC Host via TFTP. Refer to [TFTP problems](#63-tftp-problems) if there are problems.
 4. BBB executes the kernel, which is the bootsystem core and is needed to be able to boot the rest of the system via NFS.
-5. Boot the rest of the system via NFS. 
+5. Boot the rest of the system via NFS. Refer to [NFS problems](#64-nfs-problems) if you have issues with NFS.
    
 
 
@@ -97,6 +98,20 @@ done successfully the new image is booted and tests are executed. Tests aren't
 strictly part of DAFT but rather DAFT includes tools and libraries to interact
 with the device so own test can be written or existing test suites can be
 integrated.
+
+![](readme_pictures/daft_run.png)
+_Running daft._
+
+1. Start daft by executing the following command in the PC Host: "daft DUT PATH/TO/IMG.img". You can also run the command directly in BBB but it then it won't lock the DUTs. Running daft in BBB is done with the command "aft DUT PATH/TO/IMG.img".In case you want to only flash or test or boot the DUT refer to [DAFT commandline interface](#32-daft-commandline-interface) to add correct options for DAFT.
+2. DAFT then checks if the device is blacklisted in the lockfiles. If not, then it locks it so other simultaneous DAFT runs won't use the same DUT.
+3. BBB reboots the DUT and proceeds to start the support image in the DUT. The support image is needed so that the target image can be flashed to the SDcard or to another memory storage. BBB emulates itself as multiple components to enable automated and simple function: 
+   1. As a keyboard (to get through DUT bios).
+   2. As a usbdrive (so that the DUT can boot the support image).
+   3. As a ethernet (to give the DUT an IPaddress).
+4. When the support image boots, it gets an IP address from the BBBs DHCP server (NOT THE PC HOSTS). If you want to, you can SSH to the DUT from the PC Host by first doing a SSH to the BBB and then another SSH to the DUT.
+5. Flash the target image fetched from the PC Host via FNS to the DUTs memory storage. The DUT doesn't connect directly to the PC Host but instead through the BBB, which forwards the data to the DUT.
+6. Run the tests on DUT.
+
 
 ### 1.2.1 Detailed DAFT run
 
@@ -1077,9 +1092,14 @@ If you are having problems with the DHCP server, you can try the following steps
 1. Check that your dnsmasq service is on. In Fedora this is done by executing the following command "systemctl status dnsmasq". If it is not, you need to start it with "systemctl start dnsmasq". If it still isn't working, check that you have completed all the steps when configuring the [Dnsmasq](#232-dnsmasq).
 2. Make sure your firewall isn't blocking the connection. DHCP uses UDP and the ports 67 and 68, so make sure they are open. (e.g. in Fedora having iptables firewall you can check the situation with "sudo iptables -L".) 
 
-### 6.3. TFTP problems
-If you are having problems with the TFTP, you can try the following steps:
+### 6.3 TFTP problems
+If you are having problems with TFTP, you can try the following steps:
 1. Check that your TFTP server is on. Refer to [TFTP server](#233-tftp-server) and check that you have completed the steps. Note that if you are not using Ubuntu, you might have to install and setup something else (e.g. in Fedora you have to install a different tftp server because there is no xinetd).
+2. Again check that PC Hosts firewall isn't blocking the connection.
+
+### 6.4 NFS problems
+If you are having problems with NFS, you can try the following steps:
+1. Check that your NFS server is on. Refer to [NFS server](#234-nfs-server) and check that you have completed the steps. Note that if you are not using Ubuntu, you might have to configure some additional things. Search for help in the web for your distro.
 2. Again check that PC Hosts firewall isn't blocking the connection.
 
 ## DAFT hardware images
