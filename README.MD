@@ -33,6 +33,7 @@
     * 5.1 [Ubuntu for PC like devices](#51-ubuntu-for-pc-like-devices)
 6. [Troubleshooting](#6-troubleshooting)
     * 6.1 [Beaglebone Black booting](#61-beaglebone-black-booting)
+    * 6.2 [DHCP problems](#62-dhcp-problems)
 
 [DAFT hardware images](#daft-hardware-images)
 
@@ -73,7 +74,7 @@ The above diagram shows the steps when setting up the BBB and booting it:
    1. Open a "Screen" from your terminal to the serial (usually its something like ttyUSB0). You can use the following   command: "sudo screen /dev/ttyUSB0 115200 -ixon,-ixof", but remember to replace the /dev/ttyUSB0 with your own path.
    2. Now boot the BBB by supplying it power with a 5V charger. 
    3. If you are having problems when booting BBB, refer to the troubleshooting section [Beaglebone Black booting](#61-beaglebone-black-booting)
-2. Get an IP adress for the BBB from the DHCP server.
+2. Get an IP adress for the BBB from the DHCP server. Refer to [DHCP problems](#62-dhcp-problems) if you are having problems with this.
 3. Get the BBB bootsystem kernel via TFTP.
    1. 
    
@@ -1071,7 +1072,7 @@ booting but gets stuck it's probably a problem with NFS or file permissions.
 
 ### 6.2 DHCP problems
 If you are having problems with the DHCP server, you can try the following steps:
-1. Check that your dnsmasq service is on. In Fedora this is done by executing the following command "systemctl status dnsmasq". If it is not you need to start it with "systemctl start dnsmasq". If it still isn't working check that you have completed all the steps when configuring the [Dnsmasq](#232-dnsmasq).
+1. Check that your dnsmasq service is on. In Fedora this is done by executing the following command "systemctl status dnsmasq". If it is not, you need to start it with "systemctl start dnsmasq". If it still isn't working, check that you have completed all the steps when configuring the [Dnsmasq](#232-dnsmasq).
 2. Make sure your firewall isn't blocking the connection. DHCP uses UDP and the ports 67 and 68, so make sure they are open. (e.g. in Fedora having iptables firewall you can check the situation with "sudo iptables -L".) 
 
 
