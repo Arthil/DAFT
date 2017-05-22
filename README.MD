@@ -34,6 +34,7 @@
 6. [Troubleshooting](#6-troubleshooting)
     * 6.1 [Beaglebone Black booting](#61-beaglebone-black-booting)
     * 6.2 [DHCP problems](#62-dhcp-problems)
+    * 6.3 [TFTP problems](#63-tftp-problems)
 
 [DAFT hardware images](#daft-hardware-images)
 
@@ -75,7 +76,7 @@ The above diagram shows the steps when setting up the BBB and booting it:
    2. Now boot the BBB by supplying it power with a 5V charger. 
    3. If you are having problems when booting BBB, refer to the troubleshooting section [Beaglebone Black booting](#61-beaglebone-black-booting)
 2. Get an IP adress for the BBB from the DHCP server. Refer to [DHCP problems](#62-dhcp-problems) if you are having issues with this.
-3. Get the BBB bootsystem kernel via TFTP. The BBB will fetch the bootsystem kernel from the PC Host via TFTP. 
+3. Get the BBB bootsystem kernel via TFTP. The BBB will fetch the bootsystem kernel from the PC Host via TFTP. Refer to [TFTP problems](#63-tftp-problems) if there are problems.
 4. BBB executes the kernel, which is the bootsystem core and is needed to be able to boot the rest of the system via NFS.
 5. Boot the rest of the system via NFS. 
    
