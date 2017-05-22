@@ -73,7 +73,7 @@ _BeagleBone Black booting with the PC Host._
 
 The above diagram shows the steps when setting up the BBB and booting it:
 1. Connect the PC Host to the BBB via serial. 
-   1. Open a "Screen" from your terminal to the serial (usually its something like ttyUSB0). You can use the following   command: "sudo screen /dev/ttyUSB0 115200 -ixon,-ixof", but remember to replace the /dev/ttyUSB0 with your own path.
+   1. Open a "Screen" from your terminal to the serial (usually its something like `ttyUSB0`). You can use the following   command: `sudo screen /dev/ttyUSB0 115200 -ixon,-ixof` but remember to replace the /dev/ttyUSB0 with your own path.
    2. Now boot the BBB by supplying it power with a 5V charger. 
    3. If you are having problems when booting BBB, refer to the troubleshooting section [Beaglebone Black booting](#61-beaglebone-black-booting)
 2. Get an IP adress for the BBB from the DHCP server. Refer to [DHCP problems](#62-dhcp-problems) if you are having issues with this.
@@ -103,14 +103,14 @@ integrated.
 
 _Running daft._
 
-1. Start daft by executing the following command in the PC Host: "daft DUT PATH/TO/IMG.img". Replace DUT with the desired DUT e.g. minnowboard or joule and PATH/TO/IMG.img with the image you want to flash. You can also run the command directly in BBB but it then it won't lock the DUTs. Running daft in BBB is done with the command "aft DUT PATH/TO/IMG.img".In case you want to only flash or test or boot the DUT refer to [DAFT commandline interface](#32-daft-commandline-interface) to add correct options for DAFT.
+1. Start daft by executing the following command in the PC Host: `daft DUT PATH/TO/IMG.img`. Replace DUT with the desired DUT e.g. `minnowboard` or `joule` and `PATH/TO/IMG.img` with the image you want to flash. You can also run the command directly in BBB but it then it won't lock the DUTs. Running daft in BBB is done with the command `aft DUT PATH/TO/IMG.img`.In case you want to only flash or test or boot the DUT refer to [DAFT commandline interface](#32-daft-commandline-interface) to add correct options for DAFT.
 2. DAFT then checks if the device is blacklisted in the lockfiles. If not, then it locks it so other simultaneous DAFT runs won't use the same DUT.
 3. BBB reboots the DUT and proceeds to start the support image in the DUT. The support image is needed so that the target image can be flashed to the SDcard or to another memory storage. BBB emulates itself as multiple components to enable automated and simple function: 
    1. As a keyboard (to get through DUT bios).
    2. As a usbdrive (so that the DUT can boot the support image).
    3. As a ethernet (to give the DUT an IPaddress).
 4. When the support image boots, it gets an IP address from the BBBs DHCP server (NOT THE PC HOSTS). If you want to, you can SSH to the DUT from the PC Host by first doing a SSH to the BBB and then another SSH to the DUT.
-5. Flash the target image fetched from the PC Host via FNS to the DUTs memory storage. The DUT doesn't connect directly to the PC Host but instead through the BBB, which forwards the data to the DUT.
+5. Flash the target image fetched from the PC Host via NFS to the DUTs memory storage. The DUT doesn't connect directly to the PC Host but instead through the BBB, which forwards the connection both ways. 
 6. Run the tests on DUT.
 
 
@@ -253,7 +253,7 @@ sudo tar -xzf bbb_nfs.tar.gz
 
 Service wise there is different ways to do everything but the end goal is
 to have static IP address on the secondary network interface (_192.168.30.1_)
-and to have DHCP, TFTP and NFS server running on that network. This guide has
+and to have DHCP, TFTP and NFS server running on that network. It is very important that you are careful especially with the DHCP server so that you don't accidentally configure it to the wrong interface (you should never configure the DHCP server to the interface from which your PC Host gets its internet, unless you know exactly what you are doing. This guide has
 been written using Ubuntu so on different distro you might have to do things
 differently.
 
@@ -331,6 +331,7 @@ Restart and enable xinetd service:
 ```
 sudo systemctl restart xinetd; sudo systemctl enable xinetd
 ```
+Note here that not all distros have xinetd service. In that case you might have to install something else.
 
 ### 2.3.4 NFS server
 
@@ -455,7 +456,7 @@ sudo chown <b>user</b>:<b>group</b> /etc/daft/lockfiles
 ## 2.4 Setting BeagleBone Black to boot from NFS
 
 Setting BBB to boot from NFS is done by changing `/uEnv.txt` file contents on a
-BBB image to this:
+BBB image (this means the uEnv.txt file in the BBB itself and not in the NFS files) to this:
 ```
 bootcmd=setenv autoload no; dhcp; setenv bootargs console=ttyO0,115200n8, root=/dev/nfs nfsroot=${serverip}:/daft/bbb_fs,vers=3 ro ip=${ipaddr}; tftp 0x81000000 bbb_fs/boot/vmlinuz-4.4.30-ti-r64; tftp 0x80000000 bbb_fs/boot/dtbs/4.4.30-ti-r64/am335x-boneblack.dtb; bootz 0x81000000 - 0x80000000
 uenvcmd=boot
@@ -578,6 +579,8 @@ address:
 ```
 cat /var/lib/misc/dnsmasq.leases
 ```
+In some distros you don't have this file. In that case use `arp` in the terminal to do the same thing.
+
 <pre>
 1481817223 b0:d5:cc:f4:8c:41 <b>192.168.30.61</b> DAFT_BBB *
 </pre>
@@ -617,7 +620,7 @@ the watchdog can be done by:
 rm /daft/bbb_fs/etc/systemd/system/multi-user.target.wants/watchdog.service
 ```
 
-Enabling the watchdog again is done by:
+Enabling the watchdog again is done by (this service is not needed and may sometimes cause problems, so you might want to disable it if such problems arrise):
 ```
 ln -s /daft/bbb_fs/etc/systemd/system/watchdog.service /daft/bbb_fs/etc/systemd/system/multi-user.target.wants/watchdog.service
 ```
@@ -649,6 +652,13 @@ bb_ip = 192.168.30.3
 <b>[Joule2]
 bb_ip = 192.168.30.5</b>
 </pre>
+
+After these are configured, you call them the same way you'd call a single device. DAFT automatically checks which devices are in use and which are not by locking and unlocking them in
+```
+/etc/daft/lockfiles/
+```
+So you don't have to call the DUTs explicitly `daft minnowboard1 PATH/TO/DUT.img` but instead you can just call `daft minnowboard PATH/TO/DUT.img`.
+
 
 ## 3. DAFT and AFT settings and commandline interface
 
@@ -1088,10 +1098,13 @@ U-Boot is quite clunky with the pathnames so try different paths like
 `/bbb_fs/boot/*`, `daft/bbb_fs/boot/*` or `/daft/bbb_fs/boot/*`. If it starts
 booting but gets stuck it's probably a problem with NFS or file permissions.
 
+If you get an error when you try to tftp the files, check that the kernel files `vmlinuz` and `dtbs` e.g. `vmlinuz-4.4.9-ti-r25` match the ones you have.
+
+
 ### 6.2 DHCP problems
 If you are having problems with the DHCP server, you can try the following steps:
-1. Check that your dnsmasq service is on. In Fedora this is done by executing the following command "systemctl status dnsmasq". If it is not, you need to start it with "systemctl start dnsmasq". If it still isn't working, check that you have completed all the steps when configuring the [Dnsmasq](#232-dnsmasq).
-2. Make sure your firewall isn't blocking the connection. DHCP uses UDP and the ports 67 and 68, so make sure they are open. (e.g. in Fedora having iptables firewall you can check the situation with "sudo iptables -L".) 
+1. Check that your dnsmasq service is on. In Fedora this is done by executing the following command `systemctl status dnsmasq`. If it is not, you need to start it with `systemctl start dnsmasq`. If it still isn't working, check that you have completed all the steps when configuring the [Dnsmasq](#232-dnsmasq).
+2. Make sure your firewall isn't blocking the connection. DHCP uses UDP and the ports 67 and 68, so make sure they are open. (e.g. in Fedora having iptables firewall you can check the situation with `sudo iptables -L`.) 
 
 ### 6.3 TFTP problems
 If you are having problems with TFTP, you can try the following steps:
@@ -1103,6 +1116,7 @@ If you are having problems with NFS, you can try the following steps:
 1. Check that your NFS server is on. Refer to [NFS server](#234-nfs-server) and check that you have completed the steps. Note that if you are not using Ubuntu, you might have to configure some additional things. Search for help in the web for your distro.
 2. Again check that PC Hosts firewall isn't blocking the connection.
 
+We have noticed that in some other distros different than Ubuntu getting the BBB to boot from NFS can be very problematic. If you cannot get it to work, you can always boot the BBB from usbdrive. Refer to [Creating BeagleBone Black filesystem](#4-creating-beaglebone-black-filesystem) for more info.
 ## DAFT hardware images
 
 ### USB-serial
