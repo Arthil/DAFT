@@ -72,7 +72,7 @@ The above diagram shows the steps when setting up the BBB and booting it:
 1. Connect the PC Host to the BBB via serial. 
    1. Open a "Screen" from your terminal to the serial (usually its something like ttyUSB0). You can use the following   command: "sudo screen /dev/ttyUSB0 115200 -ixon,-ixof", but remember to replace the /dev/ttyUSB0 with your own path.
    2. Now boot the BBB by supplying it power with a 5V charger. 
-   3. If you are having problems when booting BBB, refer to the section (#61-beaglebone-black-booting)
+   3. If you are having problems when booting BBB, refer to the troubleshooting section [Beaglebone Black booting](#61-beaglebone-black-booting)
 2. Get an IP adress for the BBB from the DHCP server.
 3. Get the BBB bootsystem kernel via TFTP.
    1. 
