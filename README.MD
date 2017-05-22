@@ -75,8 +75,8 @@ The above diagram shows the steps when setting up the BBB and booting it:
    3. You should see text popping up in the Screen you opened. Stop the uboot sequence by tapping space.
 2. Get an IP adress for the BBB from the DHCP server.
    1. Write the following commands to the BBB Screen:
-     setenv autoload no 
-     dhcp
+      1. setenv autoload no 
+      2. dhcp
    2. Running the dhcp command should fetch a local IP address from PC Hosts DHCP-server. If not there is probably a problem with the dhcp or the PC Hosts firewall is blocking the connection.
 
 
