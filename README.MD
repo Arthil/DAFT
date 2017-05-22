@@ -49,7 +49,7 @@ testing of an OS image on a real device. Its goal is to both standardize and
 simplify the testing on a variety of devices, while keeping minimal the cost and
 the complexity of the setup. In particular, it strives to use only inexpensive
 off-the shelf hardware components and to keep one single configuration that can
-be used by both large testing farms and individual testers/developers.
+be used by both large testing farms and individual testers/developers. This guide explains how to setup and use DAFT. Note that this guide was writen for Ubuntu so you might have to do additional steps in other distributions.
 
 ## 1.1 DAFT setup
 
