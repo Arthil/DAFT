@@ -1069,6 +1069,12 @@ U-Boot is quite clunky with the pathnames so try different paths like
 `/bbb_fs/boot/*`, `daft/bbb_fs/boot/*` or `/daft/bbb_fs/boot/*`. If it starts
 booting but gets stuck it's probably a problem with NFS or file permissions.
 
+### 6.2 DHCP problems
+If you are having problems with the DHCP server, you can try the following steps:
+1. Check that your dnsmasq service is on. In Fedora this is done by executing the following command "systemctl status dnsmasq". If it is not you need to start it with "systemctl start dnsmasq". If it still isn't working check that you have completed all the steps when configuring the [Dnsmasq](#232-dnsmasq).
+2. Make sure your firewall isn't blocking the connection. DHCP uses UDP and the ports 67 and 68, so make sure they are open. (e.g. in Fedora having iptables firewall you can check the situation with "sudo iptables -L".) 
+
+
 ## DAFT hardware images
 
 ### USB-serial
