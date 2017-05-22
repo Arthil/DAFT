@@ -103,7 +103,7 @@ integrated.
 
 _Running daft._
 
-1. Start daft by executing the following command in the PC Host: "daft DUT PATH/TO/IMG.img". You can also run the command directly in BBB but it then it won't lock the DUTs. Running daft in BBB is done with the command "aft DUT PATH/TO/IMG.img".In case you want to only flash or test or boot the DUT refer to [DAFT commandline interface](#32-daft-commandline-interface) to add correct options for DAFT.
+1. Start daft by executing the following command in the PC Host: "daft DUT PATH/TO/IMG.img". Replace DUT with the desired DUT e.g. minnowboard or joule and PATH/TO/IMG.img with the image you want to flash. You can also run the command directly in BBB but it then it won't lock the DUTs. Running daft in BBB is done with the command "aft DUT PATH/TO/IMG.img".In case you want to only flash or test or boot the DUT refer to [DAFT commandline interface](#32-daft-commandline-interface) to add correct options for DAFT.
 2. DAFT then checks if the device is blacklisted in the lockfiles. If not, then it locks it so other simultaneous DAFT runs won't use the same DUT.
 3. BBB reboots the DUT and proceeds to start the support image in the DUT. The support image is needed so that the target image can be flashed to the SDcard or to another memory storage. BBB emulates itself as multiple components to enable automated and simple function: 
    1. As a keyboard (to get through DUT bios).
