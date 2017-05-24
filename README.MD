@@ -601,6 +601,9 @@ Flash and test an image while recording serial output:
 ```
 daft minnowboard yocto-image.dsk --record
 ```
+
+
+
 Next, we'll take a look at what happens when we run DAFT. This is a high level overview. For more detailed DAFT run refer to [Detailed DAFT run](#121-detailed-daft-run)
 
 ![](readme_pictures/daft_run.png)
@@ -623,9 +626,20 @@ For more info about using DAFT and its settings check
 [DAFT and AFT settings and commandline interface](#3-daft-and-aft-settings-and-commandline-interface)
 section. If flashing or entering test mode fails DAFT will blacklist the BBB
 used by locking the device until `/etc/daft/lockfiles/<device>` is emptied or
-removed.
+removed.Also be aware that BBB has a watchdog that checks periodically if it
+has connection to the _192.168.30.1_ server and also if sshd and dnsmasq
+services are running. If it doesn't it will automatically reboot BBB. Removing
+the watchdog can be done by:
+```
+rm /daft/bbb_fs/etc/systemd/system/multi-user.target.wants/watchdog.service
+```
 
-## 2.11 Adding more devices
+Enabling the watchdog again is done by (this service is not needed and may sometimes cause problems, so you might want to disable it if such problems arrise):
+```
+ln -s /daft/bbb_fs/etc/systemd/system/watchdog.service /daft/bbb_fs/etc/systemd/system/multi-user.target.wants/watchdog.service
+```
+
+## 2.10 Adding more devices
 
 ![](readme_pictures/daft_setup_three_devices.png)
 
@@ -840,8 +854,6 @@ cd /opt/scripts/boot/
 rm am335x_evm.sh autoconfigure_usb0.sh capemgr.sh
 cd
 rm /etc/systemd/system/multi-user.target.wants/connman.service
-vim /etc/apt/apt.conf.d/03-proxy-https
-    'Acquire::http::Proxy "http://yourproxyaddress:proxyport";' # Add this line to the file
 apt update
 apt install nfs-common dnsmasq python3-setuptools python3-pip
 pip3 --proxy http://yourproxyaddress:proxyport install pyserial netifaces unittest-xml-reporting
