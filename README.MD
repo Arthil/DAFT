@@ -68,23 +68,6 @@ DAFT is also split code wise with _testing_harness_ including the code BBB uses
 and _pc_host_ including the code the PC uses. The program that BBB uses is
 called AFT (Automatic Flasher Tester) and the program that the PC uses is DAFT.
 
-![](readme_pictures/BBB_booting.png)
-
-_BeagleBone Black booting with the PC Host._
-
-The above diagram shows the steps when setting up the BBB and booting it:
-1. Connect the PC Host to the BBB via serial.
-   1. Open a "Screen" from your terminal to the serial (usually its something like `ttyUSB0`). You can use the following   command: `sudo screen /dev/ttyUSB0 115200 -ixon,-ixof` but remember to replace the /dev/ttyUSB0 with your own path.
-   2. Now boot the BBB by supplying it power with a 5V charger.
-   3. If you are having problems when booting BBB, refer to the troubleshooting section [Beaglebone Black booting](#61-beaglebone-black-booting)
-2. Get an IP adress for the BBB from the DHCP server. Refer to [DHCP problems](#62-dhcp-problems) if you are having issues with this.
-3. Get the BBB bootsystem kernel via TFTP. The BBB will fetch the bootsystem kernel from the PC Host via TFTP. Refer to [TFTP problems](#63-tftp-problems) if there are problems.
-4. BBB executes the kernel, which is the bootsystem core and is needed to be able to boot the rest of the system via NFS.
-5. Boot the rest of the system via NFS. Refer to [NFS problems](#64-nfs-problems) if you have issues with NFS.
-
-
-
-
 
 ## 1.2 How it works
 
@@ -99,20 +82,6 @@ done successfully the new image is booted and tests are executed. Tests aren't
 strictly part of DAFT but rather DAFT includes tools and libraries to interact
 with the device so own test can be written or existing test suites can be
 integrated.
-
-![](readme_pictures/daft_run.png)
-
-_Running daft._
-
-1. Start daft by executing the following command in the PC Host: `daft DUT PATH/TO/IMG.img`. Replace DUT with the desired DUT e.g. `minnowboard` or `joule` and `PATH/TO/IMG.img` with the image you want to flash. You can also run the command directly in BBB but then it won't lock the DUTs. Running daft in BBB is done with the command `aft DUT PATH/TO/IMG.img`.In case you want to only flash or test or boot the DUT refer to [DAFT commandline interface](#32-daft-commandline-interface) to add correct options for DAFT.
-2. DAFT then checks if the device is blacklisted or locked in the lockfiles. If not, then it locks it so other simultaneous DAFT runs won't use the same DUT. Or if you call DAFT explicitly e.g. daft joule1, it will only look for that device.
-3. BBB reboots the DUT and proceeds to start the support image in the DUT. The support image is needed so that the target image can be flashed to the SD card or to another memory storage. BBB emulates itself as multiple components to enable automated and simple function:
-   1. As a keyboard (to get through DUT bios).
-   2. As a USB drive (so that the DUT can boot the support image).
-   3. As a ethernet (to give the DUT an IP address, ethernet is needed so the BBB can connect to the DUT and run commands on it required when flashing or testing).
-4. When the support image boots, it gets an IP address from the BBBs DHCP server (NOT THE PC HOSTS). If you want to, you can SSH to the DUT from the PC Host by first doing a SSH to the BBB and then another SSH to the DUT.
-5. Flash the target image fetched from the PC Host via NFS to the DUTs memory storage. The DUT doesn't connect directly to the PC Host but instead through the BBB, which forwards the connection both ways.
-6. Run the tests on DUT.
 
 
 ### 1.2.1 Detailed DAFT run
@@ -237,6 +206,40 @@ but any PC like device with BIOS should work with small tweaks. Older version of
 the setup was also tested to work with Gigabyte NUC, Intel Edison, BeagleBone
 Black and Intel Galileo V2 but they might require some work on the BeagleBone
 filesystem to make them work.
+
+## 2.2 BBB booting
+
+![](readme_pictures/BBB_booting.png)
+
+_BeagleBone Black booting with the PC Host._
+
+The above diagram shows the steps when setting up the BBB and booting it:
+1. Connect the PC Host to the BBB via serial.
+   1. Open a "Screen" from your terminal to the serial (usually its something like `ttyUSB0`). You can use the following   command: `sudo screen /dev/ttyUSB0 115200 -ixon,-ixof` but remember to replace the /dev/ttyUSB0 with your own path.
+   2. Now boot the BBB by supplying it power with a 5V charger.
+   3. If you are having problems when booting BBB, refer to the troubleshooting section [Beaglebone Black booting](#61-beaglebone-black-booting)
+2. Get an IP adress for the BBB from the DHCP server. Refer to [DHCP problems](#62-dhcp-problems) if you are having issues with this.
+3. Get the BBB bootsystem kernel via TFTP. The BBB will fetch the bootsystem kernel from the PC Host via TFTP. Refer to [TFTP problems](#63-tftp-problems) if there are problems.
+4. BBB executes the kernel, which is the bootsystem core and is needed to be able to boot the rest of the system via NFS.
+5. Boot the rest of the system via NFS. Refer to [NFS problems](#64-nfs-problems) if you have issues with NFS.
+
+## 2.3 DAFT run
+
+
+![](readme_pictures/daft_run.png)
+
+_Running daft._
+
+1. Start daft by executing the following command in the PC Host: `daft DUT PATH/TO/IMG.img`. Replace DUT with the desired DUT e.g. `minnowboard` or `joule` and `PATH/TO/IMG.img` with the image you want to flash. You can also run the command directly in BBB but then it won't lock the DUTs. Running daft in BBB is done with the command `aft DUT PATH/TO/IMG.img`.In case you want to only flash or test or boot the DUT refer to [DAFT commandline interface](#32-daft-commandline-interface) to add correct options for DAFT.
+2. DAFT then checks if the device is blacklisted or locked in the lockfiles. If not, then it locks it so other simultaneous DAFT runs won't use the same DUT. Or if you call DAFT explicitly e.g. daft joule1, it will only look for that device.
+3. BBB reboots the DUT and proceeds to start the support image in the DUT. The support image is needed so that the target image can be flashed to the SD card or to another memory storage. BBB emulates itself as multiple components to enable automated and simple function:
+   1. As a keyboard (to get through DUT bios).
+   2. As a USB drive (so that the DUT can boot the support image).
+   3. As a ethernet (to give the DUT an IP address, ethernet is needed so the BBB can connect to the DUT and run commands on it required when flashing or testing).
+4. When the support image boots, it gets an IP address from the BBBs DHCP server (NOT THE PC HOSTS). If you want to, you can SSH to the DUT from the PC Host by first doing a SSH to the BBB and then another SSH to the DUT.
+5. Flash the target image fetched from the PC Host via NFS to the DUTs memory storage. The DUT doesn't connect directly to the PC Host but instead through the BBB, which forwards the connection both ways.
+6. Run the tests on DUT.
+
 
 ## 2.2 Setting up BeagleBone Black filesystem on the host PC
 
