@@ -8,21 +8,22 @@
     * 1.2.1 [Detailed DAFT run](#121-detailed-daft-run)
 2. [Creating DAFT setup](#2-creating-daft-setup)
     * 2.1 [Required hardware](#21-required-hardware)
-    * 2.2 [Setting up BeagleBone Black filesystem on the host PC](#22-setting-up-beaglebone-black-filesystem-on-the-host-pc)
-    * 2.3 [Configuring host PC](#23-configuring-host-pc)
-        * 2.3.1 [Secondary network interface](#231-secondary-network-interface)
-        * 2.3.2 [Dnsmasq](#232-dnsmasq)
-        * 2.3.3 [TFTP server](#233-tftp-server)
-        * 2.3.4 [NFS server](#234-nfs-server)
-        * 2.3.5 [Changing BBB filesystem permissions](#235-changing-bbb-filesystem-permissions)
-        * 2.3.6 [Changing NFS workspace that BBB and DUT support image will mount](#236-changing-nfs-workspace-that-bbb-and-dut-support-image-will-mount)
-        * 2.3.7 [Install and configure DAFT software](#237-install-and-configure-daft-software)
-    * 2.4 [Setting BeagleBone Black to boot from NFS](#24-setting-beaglebone-black-to-boot-from-nfs)
-    * 2.5 [Setting up relay](#25-setting-up-relay)
-    * 2.6 [Connecting hardware](#26-connecting-hardware)
-    * 2.7 [Setting up DUT](#27-setting-up-dut)
-    * 2.8 [Using DAFT](#28-using-daft)
-    * 2.9 [Adding more devices](#29-adding-more-devices)
+    * 2.2 [BBB booting](#22-bbb-booting)
+    * 2.3 [Setting up BeagleBone Black filesystem on the host PC](#23-setting-up-beaglebone-black-filesystem-on-the-host-pc)
+    * 2.4 [Configuring host PC](#24-configuring-host-pc)
+        * 2.4.1 [Secondary network interface](#241-secondary-network-interface)
+        * 2.4.2 [Dnsmasq](#242-dnsmasq)
+        * 2.4.3 [TFTP server](#243-tftp-server)
+        * 2.4.4 [NFS server](#244-nfs-server)
+        * 2.4.5 [Changing BBB filesystem permissions](#245-changing-bbb-filesystem-permissions)
+        * 2.4.6 [Changing NFS workspace that BBB and DUT support image will mount](#246-changing-nfs-workspace-that-bbb-and-dut-support-image-will-mount)
+        * 2.4.7 [Install and configure DAFT software](#247-install-and-configure-daft-software)
+    * 2.5 [Setting BeagleBone Black to boot from NFS](#25-setting-beaglebone-black-to-boot-from-nfs)
+    * 2.6 [Setting up relay](#26-setting-up-relay)
+    * 2.7 [Connecting hardware](#27-connecting-hardware)
+    * 2.8 [Setting up DUT](#28-setting-up-dut)
+    * 2.9 [Using DAFT](#29-using-daft)
+    * 2.10 [Adding more devices](#210-adding-more-devices)
 3. [DAFT and AFT settings and commandline interface](#3-daft-and-aft-settings-and-commandline-interface)
     * 3.1 [DAFT settings](#31-daft-settings)
     * 3.2 [DAFT commandline interface](#32-daft-commandline-interface)
@@ -153,16 +154,17 @@ Fewest mandatory steps to create DAFT setup with one device under test (DUT) and
 BeagleBone Black (BBB):
 
 * [Get required hardware](#21-required-hardware)
-* [Set up BeagleBone Black filesystem on the PC](#22-setting-up-beaglebone-black-filesystem-on-the-host-pc)
-* [Configure host PC](#23-configuring-host-pc)
-* [Set BeagleBone Black to boot from NFS](#24-setting-beaglebone-black-to-boot-from-nfs)
-* [Set up relay](#25-setting-up-relay)
-* [Connect hardware together](#26-connecting-hardware)
-* [Set up DUT](#27-setting-up-dut)
-* [Use DAFT](#28-using-daft)
+* [BBB booting](#22-bbb-booting)
+* [Set up BeagleBone Black filesystem on the PC](#23-setting-up-beaglebone-black-filesystem-on-the-host-pc)
+* [Configure host PC](#24-configuring-host-pc)
+* [Set BeagleBone Black to boot from NFS](#25-setting-beaglebone-black-to-boot-from-nfs)
+* [Set up relay](#26-setting-up-relay)
+* [Connect hardware together](#27-connecting-hardware)
+* [Set up DUT](#28-setting-up-dut)
+* [Use DAFT](#29-using-daft)
 
 When the setup has been completed check the section on
-[adding more devices](#29-adding-more-devices).
+[adding more devices](#210-adding-more-devices).
 
 ## 2.1 Required hardware
 
@@ -197,7 +199,7 @@ List of hardware needed for DAFT setup:
       doesn't have to drive the coil
 * 3x Dupont cables to connect relay to BBB
 * DC plug extension cable (recommended)
-    * [So you don't have to cut power supply cable](#25-setting-up-relay)
+    * [So you don't have to cut power supply cable](#26-setting-up-relay)
     * Flat extension cables that have easily separable ground and DC cables are
       recommended
 
@@ -208,6 +210,8 @@ Black and Intel Galileo V2 but they might require some work on the BeagleBone
 filesystem to make them work.
 
 ## 2.2 BBB booting
+
+This section will give you an overview of the BBB booting components, boot sequence and how it relates to the PC Host. This should give you a good understanding of why we need to setup various different services and what is their role.
 
 ![](readme_pictures/BBB_booting.png)
 
@@ -357,7 +361,7 @@ sudo systemctl restart nfs-kernel-server; sudo systemctl enable nfs-kernel-serve
 
 ### 2.4.5 Changing BBB filesystem permissions
 
-Previously on the [NFS chapter](#234-nfs-server) we chose a user that DAFT will be
+Previously on the [NFS chapter](#244-nfs-server) we chose a user that DAFT will be
 used with. We will need to change the owner of `/daft/bbb_fs` and
 `/daft/support_img` to that user and users group. It's done with:
 <pre>
@@ -367,7 +371,7 @@ sudo chown root:root /daft/bbb_fs/root/.ssh/config
 
 ### 2.4.6 Changing NFS workspace that BBB and DUT support image will mount
 
-On the [NFS chapter](#234-nfs-server) we chose a workspace for BBB to use. We need
+On the [NFS chapter](#244-nfs-server) we chose a workspace for BBB to use. We need
 to change **/home/tester** in `/daft/bbb_fs/etc/fstab` to that one:
 ```
 sudo vim /daft/bbb_fs/etc/fstab
@@ -421,7 +425,7 @@ sudo apt install python3-setuptools
 cd DAFT/pc_host; sudo python3 setup.py install
 ```
 
-Change DAFT configuration file to use your [previously chosen](#234-nfs-server)
+Change DAFT configuration file to use your [previously chosen](#244-nfs-server)
 workspace directory instead of **/home/tester/**:
 <pre>
 sudo vim /etc/daft/daft.cfg
@@ -597,7 +601,7 @@ Flash and test an image while recording serial output:
 ```
 daft minnowboard yocto-image.dsk --record
 ```
-
+Next, we'll take a look at what happens when we run DAFT. This is a high level overview. For more detailed DAFT run refer to [Detailed DAFT run](#121-detailed-daft-run)
 
 ![](readme_pictures/daft_run.png)
 
@@ -1099,17 +1103,17 @@ If you get an error when you try to tftp the files, check that the kernel files 
 
 ### 6.2 DHCP problems
 If you are having problems with the DHCP server, you can try the following steps:
-1. Check that your dnsmasq service is on. This is done by executing the following command `systemctl status dnsmasq`. If it is not, you need to start it with `systemctl start dnsmasq`. If it still isn't working, check that you have completed all the steps when configuring the [Dnsmasq](#232-dnsmasq).
+1. Check that your dnsmasq service is on. This is done by executing the following command `systemctl status dnsmasq`. If it is not, you need to start it with `systemctl start dnsmasq`. If it still isn't working, check that you have completed all the steps when configuring the [Dnsmasq](#242-dnsmasq).
 2. Make sure your firewall isn't blocking the connection. DHCP uses UDP and the ports 67 and 68, so make sure they are open. (e.g. if you have iptables firewall you can check the situation with `sudo iptables -L`.)
 
 ### 6.3 TFTP problems
 If you are having problems with TFTP, you can try the following steps:
-1. Check that your TFTP server is on. Refer to [TFTP server](#233-tftp-server) and check that you have completed the steps. Note that if you are not using Ubuntu, you might have to install and setup something else (e.g. in Fedora you have to install a different tftp server because there is no xinetd).
+1. Check that your TFTP server is on. Refer to [TFTP server](#243-tftp-server) and check that you have completed the steps. Note that if you are not using Ubuntu, you might have to install and setup something else (e.g. in Fedora you have to install a different tftp server because there is no xinetd).
 2. Again check that PC Hosts firewall isn't blocking the connection.
 
 ### 6.4 NFS problems
 If you are having problems with NFS, you can try the following steps:
-1. Check that your NFS server is on. Refer to [NFS server](#234-nfs-server) and check that you have completed the steps. Note that if you are not using Ubuntu, you might have to configure some additional things. Search for help in the web for your distro.
+1. Check that your NFS server is on. Refer to [NFS server](#244-nfs-server) and check that you have completed the steps. Note that if you are not using Ubuntu, you might have to configure some additional things. Search for help in the web for your distro.
 2. Again check that PC Hosts firewall isn't blocking the connection.
 
 We have noticed that in some other distros different than Ubuntu getting the BBB to boot from NFS can be very problematic. If you cannot get it to work, you can always boot the BBB from USB drive. Refer to [Creating BeagleBone Black filesystem](#4-creating-beaglebone-black-filesystem) for more info.
