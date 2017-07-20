@@ -144,29 +144,33 @@ def reserve_device(args):
             if device["device_type"].lower() == dut or \
                device["device"].lower() == dut:
                 dut_found = 1
-                lockfile = "/etc/daft/lockfiles/" + device["device"]
-                write_mode = "w+"
-                if os.path.isfile(lockfile):
-                    write_mode = "r+"
-                with open(lockfile, write_mode) as f:
-                    lockfile_contents = f.read()
-                    if not lockfile_contents:
-                        f.write("Locked\n")
-                        print("Reserved " + device["device"])
-                        print("Waiting took: " + time_used(start_time))
-                        return device
-                    if "Locked\n" == lockfile_contents:
-                        duts_blacklisted = 0
+                if not args.overridelock:
+                    lockfile = "/etc/daft/lockfiles/" + device["device"]
+                    write_mode = "w+"
+                    if os.path.isfile(lockfile):
+                        write_mode = "r+"
+                    with open(lockfile, write_mode) as f:
+                        lockfile_contents = f.read()
+                        if not lockfile_contents:
+                            f.write("Locked\n")
+                            print("Reserved " + device["device"])
+                            print("Waiting took: " + time_used(start_time))
+                            return device
+                        if "Locked\n" == lockfile_contents:
+                            duts_blacklisted = 0
+                if args.overridelock:
+                    print("Overridelock mode is ON, ignoring all lockfiles...")
 
         if not dut_found:
             print("Device name '" + dut + "', was not found in "
                   "/etc/daft/devices.cfg")
             raise DeviceNameError()
 
-        if duts_blacklisted:
-            print("All devices named '" + dut + "' are blacklisted in "
-                  "/etc/daft/lockfiles.")
-            raise DevicesBlacklistedError()
+        if not args.overridelock:
+            if duts_blacklisted:
+                print("All devices named '" + dut + "' are blacklisted in "
+                      "/etc/daft/lockfiles.")
+                raise DevicesBlacklistedError()
 
         time.sleep(10)
 
@@ -188,11 +192,12 @@ def release_device(beaglebone_dut):
     '''
     Release Beaglebone/DUT lock
     '''
-    if beaglebone_dut:
-        lockfile = "/etc/daft/lockfiles/" + beaglebone_dut["device"]
-        with open(lockfile, "w") as f:
-            f.write("")
-            print("Released " + beaglebone_dut["device"])
+    if not args.overridelock:
+        if beaglebone_dut:
+            lockfile = "/etc/daft/lockfiles/" + beaglebone_dut["device"]
+            with open(lockfile, "w") as f:
+                f.write("")
+                print("Released " + beaglebone_dut["device"])
 
 def execute_usb_emulation(bb_dut, args, config):
     '''
@@ -473,6 +478,12 @@ def parse_args():
         action="store_true",
         default=False,
         help="Flash DUT and reboot it in test mode without running test stuff")
+
+    parser.add_argument(
+        "--overridelock",
+        action="store_true",
+        default=False,
+        help="Ignore the DAFT lockfiles (/etc/daft/lockfiles/*)")
 
     return parser.parse_args()
 
